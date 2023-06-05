@@ -6,14 +6,14 @@ A simple Flask API that is deployed to AWS and uses DynamoDB as a database.
 Use asdf to manage the python version:
 ```bash
 asdf current python
-> python 3.11.3 .../microservices/microservice-simple/.tool-versions
+> python 3.11.3 .../microservices/microservice_dynamodb/.tool-versions
 ```
 ### Pyenv
 Use a new pyenv to manage dependencies:
 ```bash
 pyenv-new && pyenv-activate && pyenv-install-reqs
 which python
-> ...microservices/microservice-simple/python_flask_docker_service/env/bin/python
+> ...microservices/microservice_dynamodb/.tool-versions
 ```
 ### Flask
 Run flask locally in debug mode:
@@ -28,14 +28,36 @@ curl --request GET \
 ### Docker
 Build the docker image:
 ```bash
-docker build -t python_flask_docker_service .
+docker build -f Dockerfile.dev -t python_flask_docker_service:dev .
 ```
 Run the docker image:
 ```bash
-docker run -dp 5000:5000 python_flask_docker_service
+docker run -dp 5000:5000 python_flask_docker_service:dev
 ```
 Test your endpoint:
 ```bash
 curl --request GET \
   --url http://localhost:5000/ping/dave
+```
+### Docker Compose
+Build the service and local dynamodb:
+```bash
+docker-compose up
+```
+### Dynamo
+Create a table:
+```bash
+aws dynamodb create-table \
+    --table-name <<Table Name>> \
+    --attribute-definitions \
+        AttributeName=,AttributeType=S \
+        AttributeName=SongTitle,AttributeType=S \
+    --key-schema AttributeName=Id,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
+    --table-class STANDARD \
+    --endpoint-url http://localhost:8000
+```
+List tables:
+```bash
+aws dynamodb list-tables --endpoint-url http://localhost:8000
 ```
