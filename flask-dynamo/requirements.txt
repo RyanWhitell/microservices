@@ -1,0 +1,6 @@
+pytest
+pytest-mock
+flask
+boto3
+pynamodb
+awscli
