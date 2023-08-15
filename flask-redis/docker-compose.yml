@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  redis-stack:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+  service-node:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "redis-stack"
+    links:
+      - "redis-stack"
+    environment:
+      - STAGE=compose
